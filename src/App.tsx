@@ -299,7 +299,7 @@ export default function JungleGame() {
     <div className="flex min-h-screen flex-col items-center justify-center bg-green-100 p-4">
       <h1 className="mb-4">
         <span className="bg-gradient-to-r from-pink-500 to-violet-500 bg-clip-text text-4xl font-bold text-transparent">
-          Jungle Game
+          Jungle
         </span>
       </h1>
       <div className="grid grid-cols-7 gap-1 rounded-lg bg-green-400 p-4 shadow-lg">
