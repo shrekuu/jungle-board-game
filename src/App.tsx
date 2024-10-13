@@ -1,10 +1,9 @@
-"use client"
+'use client';
 
-import { useState, useEffect } from 'react'
-import { Button } from "@/components/ui/button"
-import { AlertCircle } from "lucide-react"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { cn } from './lib/utils'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { AlertCircle } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { cn } from './lib/utils';
 
 type TAnimal = {
   name: TAnimalName;
@@ -13,58 +12,51 @@ type TAnimal = {
 
 const allAnimals: TAnimal[] = [
   {
-    name: 'elephant', animalsCanEat: [
-      'lion', 'tiger','leopard','wolf', 'dog', 'cat'
-    ]
+    name: 'elephant',
+    animalsCanEat: ['lion', 'tiger', 'leopard', 'wolf', 'dog', 'cat'],
   },
   {
-    name: 'lion', animalsCanEat: [
-      'tiger','leopard','wolf', 'dog', 'cat', 'rat'
-    ]
+    name: 'lion',
+    animalsCanEat: ['tiger', 'leopard', 'wolf', 'dog', 'cat', 'rat'],
   },
   {
-    name: 'tiger', animalsCanEat: [
-      'leopard','wolf', 'dog', 'cat', 'rat'
-    ]
+    name: 'tiger',
+    animalsCanEat: ['leopard', 'wolf', 'dog', 'cat', 'rat'],
   },
   {
-    name: 'leopard', animalsCanEat: [
-      'wolf', 'dog', 'cat', 'rat'
-    ]
+    name: 'leopard',
+    animalsCanEat: ['wolf', 'dog', 'cat', 'rat'],
   },
   {
-    name: 'wolf', animalsCanEat: [
-      'dog', 'cat', 'rat'
-    ]
+    name: 'wolf',
+    animalsCanEat: ['dog', 'cat', 'rat'],
   },
   {
-    name: 'dog', animalsCanEat: [
-      'cat', 'rat'
-    ]
+    name: 'dog',
+    animalsCanEat: ['cat', 'rat'],
   },
   {
-    name: 'cat', animalsCanEat: [
-      'rat'
-    ]
+    name: 'cat',
+    animalsCanEat: ['rat'],
   },
   {
-    name: 'rat', animalsCanEat: [
-      'elephant',
-  ]},
-]
+    name: 'rat',
+    animalsCanEat: ['elephant'],
+  },
+];
 
-type TCellName = 'den' | 'trap' | 'river' | ''
+type TCellName = 'den' | 'trap' | 'river' | '';
 
-const  gameBoardLayout :TCellName[][]  = [
-  ['','', 'trap', 'den', 'trap', '', ''],
+const gameBoardLayout: TCellName[][] = [
+  ['', '', 'trap', 'den', 'trap', '', ''],
   ['', '', '', 'trap', '', '', ''],
-  ['',  '', '', '', '',  '', ''],
+  ['', '', '', '', '', '', ''],
   ['', 'river', 'river', '', 'river', 'river', ''],
   ['', 'river', 'river', '', 'river', 'river', ''],
   ['', 'river', 'river', '', 'river', 'river', ''],
-  ['',  '','','', '', '', '',],
-  ['','', '', 'trap', '',  '', ''],
-  ['', '', 'trap', 'den', 'trap', '', '']
+  ['', '', '', '', '', '', ''],
+  ['', '', '', 'trap', '', '', ''],
+  ['', '', 'trap', 'den', 'trap', '', ''],
 ];
 
 const getCellEmoji = (cellName: TCellName) => {
@@ -75,62 +67,78 @@ const getCellEmoji = (cellName: TCellName) => {
     '': '',
   } as const;
   return cellEmojis[cellName];
-}
+};
 
 type TAnimalName = 'rat' | 'cat' | 'dog' | 'wolf' | 'leopard' | 'tiger' | 'lion' | 'elephant' | '';
 
 const getAnimalEmoji = (animalName: TAnimalName) => {
-
-  console.log('name', animalName)
   return {
-    'elephant': '🐘',
-    'lion': '🦁',
-    'tiger': '🐯',
-    'leopard': '🐆',
-    'wolf': '🐺',
-    'dog': '🐶',
-    'cat': '🐱',
-    'rat': '🐀',
+    elephant: '🐘',
+    lion: '🦁',
+    tiger: '🐯',
+    leopard: '🐆',
+    wolf: '🐺',
+    dog: '🐶',
+    cat: '🐱',
+    rat: '🐀',
     '': '',
-  }[animalName]
-}
+  }[animalName];
+};
 
 type TPlayer = {
   name: string;
   color: string;
-}
+};
 
-const createPlayerFromNo = (no: 1 | 2) => { 
+const createPlayerFromNo = (no: 1 | 2) => {
   return {
     name: `Player ${no}`,
     color: no === 1 ? 'red' : 'blue',
-  }
-}
+  };
+};
 
 const createAnimal = (name: TAnimalName, playerNo: 1 | 2) => {
   return {
     name,
     player: createPlayerFromNo(playerNo),
-  }
-}
+  };
+};
 
-type TGameCellState = {
-  name: TAnimalName;
-  player: TPlayer;
-} | ''
+type TGameCellState =
+  | {
+      name: TAnimalName;
+      player: TPlayer;
+    }
+  | '';
 
-type TGameState = TGameCellState[][]
+type TGameState = TGameCellState[][];
 
-const initialGameState :TGameState  = [
-  [createAnimal('lion', 1),'', '', '', '', '', createAnimal('tiger', 1)],
+const initialGameState: TGameState = [
+  [createAnimal('lion', 1), '', '', '', '', '', createAnimal('tiger', 1)],
   ['', createAnimal('dog', 1), '', '', '', createAnimal('cat', 1), ''],
-  [createAnimal('rat', 1),  '', createAnimal('leopard', 1), '', createAnimal('wolf', 1), '', createAnimal('elephant', 1)],
+  [
+    createAnimal('rat', 1),
+    '',
+    createAnimal('leopard', 1),
+    '',
+    createAnimal('wolf', 1),
+    '',
+    createAnimal('elephant', 1),
+  ],
   ['', '', '', '', '', '', ''],
   ['', '', '', '', '', '', ''],
   ['', '', '', '', '', '', ''],
-  [createAnimal('elephant', 2),  '',createAnimal('wolf', 2), '', createAnimal('leopard', 2), createAnimal('rat', 2)],
-  ['', createAnimal('cat',2 ), '', '', '',  createAnimal('dog', 2), ''],
-  [createAnimal('tiger', 2), '', '', '', '', '', createAnimal('lion', 2)]
+  [
+    createAnimal('elephant', 2),
+    '',
+    createAnimal('wolf', 2),
+    '',
+    createAnimal('leopard', 2),
+    '',
+    createAnimal('rat', 2),
+  ],
+  ['', createAnimal('cat', 2), '', '', '', createAnimal('dog', 2), ''],
+  [createAnimal('tiger', 2), '', '', '', '', '', createAnimal('lion', 2)],
 ];
 
 export default function JungleGame() {
@@ -145,75 +153,183 @@ export default function JungleGame() {
 
   const isTrap = (row: number, col: number): boolean => {
     return gameBoardLayout[row][col] === 'trap';
-  }
+  };
 
   const isDen = (row: number, col: number): boolean => {
     return gameBoardLayout[row][col] === 'den';
-  }
+  };
 
   const canEat = (attacker: TAnimalName, defender: TAnimalName): boolean => {
-    const attackerObj = allAnimals.find(animal => animal.name === attacker);
+    const attackerObj = allAnimals.find((animal) => animal.name === attacker);
     return attackerObj?.animalsCanEat.includes(defender) || false;
-  }
+  };
 
   const isValidMove = (fromRow: number, fromCol: number, toRow: number, toCol: number): boolean => {
-    // const animal = boardLayout[fromRow][fromCol];
-    // Additional logic for isValidMove
+    // can't move to the same cell
+    if (fromRow === toRow && fromCol === toCol) {
+      return false;
+    }
+
+    // can't move to a cell that has the same player's animal
+    if (gameState[toRow][toCol] && gameState[toRow][toCol].player.color === currentPlayer.color) {
+      return false;
+    }
+
+    // can't move to a cell that is a river if the animal is not a rat
+    if (isriver(toRow, toCol) && gameState[fromRow][fromCol] && gameState[fromRow][fromCol].name !== 'rat') {
+      return false;
+    }
+
+    // can't eat oponent's animal that is not in the animalsCanEat list
+    if (gameState[toRow][toCol] && gameState[toRow][toCol].player.color !== currentPlayer.color) {
+      if (gameState[fromRow][fromCol] && !canEat(gameState[fromRow][fromCol].name, gameState[toRow][toCol].name)) {
+        return false;
+      }
+    }
+
+    // can only move to cells that is next to the current cell
+    if (Math.abs(fromRow - toRow) > 1 || Math.abs(fromCol - toCol) > 1) {
+      return false;
+    }
+
+    // cannot move diagonally
+    if (fromRow !== toRow && fromCol !== toCol) {
+      return false;
+    }
+
     return true;
   };
 
+  const hasAnimal = (row: number, col: number): boolean => {
+    return gameState[row][col] !== '';
+  };
+
+  const checkWinner = () => {
+    // if one of the player's animal reaches the den, the player wins
+    // TODO: implement this
+
+    // if all of the opponent's animals are eaten, the current player wins
+    const redPlayerAnimals = gameState.flat().filter((cell) => cell && cell.player.color === 'red');
+    const bluePlayerAnimals = gameState.flat().filter((cell) => cell && cell.player.color === 'blue');
+
+    const redPlayerWon = bluePlayerAnimals.every((cell) => cell && cell.name === '');
+    const bluePlayerWon = redPlayerAnimals.every((cell) => cell && cell.name === '');
+
+    if (redPlayerWon) {
+      setWinner(createPlayerFromNo(1));
+    }
+
+    if (bluePlayerWon) {
+      setWinner(createPlayerFromNo(2));
+    }
+  };
 
   const handleCellClick = (row: number, col: number) => {
-   
-   
+    // click again current player's animal to unselect
+    if (selectedCell && selectedCell[0] === row && selectedCell[1] === col) {
+      setSelectedCell(null);
+      return;
+    }
+
+    // click another current player's animal to select
+    if (selectedCell === null && hasAnimal(row, col)) {
+      setSelectedCell([row, col]);
+      return;
+    }
+
+    const currentPlayer =
+      selectedCell &&
+      gameState[selectedCell[0]][selectedCell[1]] &&
+      gameState[selectedCell[0]][selectedCell[1]]?.player;
+
+    // if target cell has my animal, select it
+    if (
+      selectedCell &&
+      hasAnimal(row, col) &&
+      currentPlayer &&
+      gameState[row][col] &&
+      currentPlayer.color === gameState[row][col].player.color
+    ) {
+      console.log('hi');
+      setSelectedCell([row, col]);
+      return;
+    }
+
+    if (selectedCell && isValidMove(selectedCell[0], selectedCell[1], row, col)) {
+      const newGameState = [...gameState];
+      newGameState[row][col] = gameState[selectedCell[0]][selectedCell[1]];
+      newGameState[selectedCell[0]][selectedCell[1]] = '';
+      setGameState(newGameState);
+      setSelectedCell(null);
+      setCurrentPlayer(currentPlayer.color === 'red' ? createPlayerFromNo(2) : createPlayerFromNo(1));
+    }
+
+    checkWinner();
+  };
+
+  const resetGame = () => {
+    initGame();
   };
 
   const initGame = () => {
     setGameState(initialGameState);
     setCurrentPlayer(createPlayerFromNo(1));
     setSelectedCell(null);
-    setWinner(null);  
-  }
+    setWinner(null);
+  };
 
   useEffect(() => {
-    initGame()
-  }, [])
-
+    initGame();
+  }, []);
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-green-100 p-4">
-      <h1 className="text-4xl font-bold mb-4">Jungle Game</h1>
-      <div className={`mb-4 text-2xl font-bold ${currentPlayer.color === 'red' ? 'text-red-600' : 'text-blue-600'}`}>
-        Current Player: {currentPlayer.color === 'red' ? '🔴' : '🔵'}
-      </div>
-      <div className="grid grid-cols-7 gap-1 p-4 bg-green-400 rounded-lg shadow-lg">
-        {gameBoardLayout.map((row, rowIndex) => (
+    <div className="flex min-h-screen flex-col items-center justify-center bg-green-100 p-4">
+      <h1 className="mb-4 text-4xl font-bold">Jungle Game</h1>
+      <div className="grid grid-cols-7 gap-1 rounded-lg bg-green-400 p-4 shadow-lg">
+        {gameBoardLayout.map((row, rowIndex) =>
           row.map((cell, colIndex) => (
-            <Button
+            <div
               key={`${rowIndex}-${colIndex}`}
-              className={cn(`w-12 h-12 flex items-center justify-center text-2xl`,
-                // getAnimalColor(rowIndex, colIndex) === 'red' ? 'bg-red-200' :
-                // getAnimalColor(rowIndex, colIndex) === 'blue' ? 'bg-blue-200' : ''
+              className={cn(
+                `relative flex h-10 w-10 select-none items-center justify-center rounded bg-white text-2xl`,
+                {
+                  'z-10 scale-110 ring-4 ring-red-500':
+                    selectedCell && selectedCell[0] === rowIndex && selectedCell[1] === colIndex,
+                }
               )}
               onClick={() => handleCellClick(rowIndex, colIndex)}
-              variant="outline"
             >
               {getCellEmoji(cell)}
-
-              <span className="absolute">{   getAnimalEmoji(gameState?.[rowIndex]?.[colIndex]?.name)}</span>
-
-              
-            </Button>
+              <div
+                className={cn(
+                  'absolute inset-0 grid cursor-pointer place-content-center rounded bg-white/50 text-3xl',
+                  {
+                    'bg-red-200':
+                      gameState?.[rowIndex]?.[colIndex] && gameState?.[rowIndex]?.[colIndex]?.player.color === 'red',
+                    'bg-blue-200':
+                      gameState?.[rowIndex]?.[colIndex] && gameState?.[rowIndex]?.[colIndex]?.player.color === 'blue',
+                  }
+                )}
+              >
+                {gameState?.[rowIndex]?.[colIndex] && gameState?.[rowIndex]?.[colIndex]?.name !== ''
+                  ? getAnimalEmoji(gameState[rowIndex][colIndex].name)
+                  : ''}
+              </div>
+            </div>
           ))
-        ))}
+        )}
+      </div>
+
+      <div className="p-10">
+        <button className="h-10 rounded-full bg-red-600 px-4 font-bold text-neutral-100" onClick={resetGame}>
+          reset
+        </button>
       </div>
       {winner && (
         <Alert className="mt-4">
           <AlertCircle className="h-4 w-4" />
           <AlertTitle>Game Over!</AlertTitle>
-          <AlertDescription>
-            {winner.color === 'red' ? '🔴' : '🔵'} player wins!
-          </AlertDescription>
+          <AlertDescription>{winner.color === 'red' ? '🔴' : '🔵'} player wins!</AlertDescription>
         </Alert>
       )}
     </div>
