@@ -1,7 +1,5 @@
 'use client';
 
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { AlertCircle } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { cn } from './lib/utils';
 
@@ -13,35 +11,35 @@ type TAnimal = {
 const allAnimals: TAnimal[] = [
   {
     name: 'elephant',
-    animalsCanEat: ['lion', 'tiger', 'leopard', 'wolf', 'dog', 'cat'],
+    animalsCanEat: ['elephant', 'lion', 'tiger', 'leopard', 'wolf', 'dog', 'cat'],
   },
   {
     name: 'lion',
-    animalsCanEat: ['tiger', 'leopard', 'wolf', 'dog', 'cat', 'rat'],
+    animalsCanEat: ['lion', 'tiger', 'leopard', 'wolf', 'dog', 'cat', 'rat'],
   },
   {
     name: 'tiger',
-    animalsCanEat: ['leopard', 'wolf', 'dog', 'cat', 'rat'],
+    animalsCanEat: ['tiger', 'leopard', 'wolf', 'dog', 'cat', 'rat'],
   },
   {
     name: 'leopard',
-    animalsCanEat: ['wolf', 'dog', 'cat', 'rat'],
+    animalsCanEat: ['leopard', 'wolf', 'dog', 'cat', 'rat'],
   },
   {
     name: 'wolf',
-    animalsCanEat: ['dog', 'cat', 'rat'],
+    animalsCanEat: ['wolf', 'dog', 'cat', 'rat'],
   },
   {
     name: 'dog',
-    animalsCanEat: ['cat', 'rat'],
+    animalsCanEat: ['dog', 'cat', 'rat'],
   },
   {
     name: 'cat',
-    animalsCanEat: ['rat'],
+    animalsCanEat: ['cat', 'rat'],
   },
   {
     name: 'rat',
-    animalsCanEat: ['elephant'],
+    animalsCanEat: ['rat', 'elephant'],
   },
 ];
 
@@ -143,7 +141,7 @@ const initialGameState: TGameState = [
 
 export default function JungleGame() {
   const [gameState, setGameState] = useState<TGameState>([]);
-  const [currentPlayer, setCurrentPlayer] = useState<TPlayer>(createPlayerFromNo(1));
+  // const [currentPlayer, setCurrentPlayer] = useState<TPlayer>(createPlayerFromNo(1));
   const [selectedCell, setSelectedCell] = useState<[number, number] | null>(null);
   const [winner, setWinner] = useState<TPlayer | null>(null);
 
@@ -167,35 +165,48 @@ export default function JungleGame() {
   const isValidMove = (fromRow: number, fromCol: number, toRow: number, toCol: number): boolean => {
     // can't move to the same cell
     if (fromRow === toRow && fromCol === toCol) {
+      console.warn("can't move to the same cell");
       return false;
     }
 
+    const currentPlayer =
+      selectedCell &&
+      gameState[selectedCell[0]][selectedCell[1]] &&
+      gameState[selectedCell[0]][selectedCell[1]]?.player;
+
     // can't move to a cell that has the same player's animal
     if (gameState[toRow][toCol] && gameState[toRow][toCol].player.color === currentPlayer.color) {
+      console.warn("can't move to a cell that has the same player's animal");
       return false;
     }
 
     // can't move to a cell that is a river if the animal is not a rat
     if (isriver(toRow, toCol) && gameState[fromRow][fromCol] && gameState[fromRow][fromCol].name !== 'rat') {
+      console.warn("can't move to a cell that is a river if the animal is not a rat");
       return false;
     }
 
     // can't eat oponent's animal that is not in the animalsCanEat list
     if (gameState[toRow][toCol] && gameState[toRow][toCol].player.color !== currentPlayer.color) {
       if (gameState[fromRow][fromCol] && !canEat(gameState[fromRow][fromCol].name, gameState[toRow][toCol].name)) {
+        console.warn("can't eat oponent's animal that is not in the animalsCanEat list");
         return false;
       }
     }
 
     // can only move to cells that is next to the current cell
     if (Math.abs(fromRow - toRow) > 1 || Math.abs(fromCol - toCol) > 1) {
+      console.warn('can only move to cells that is next to the current cell');
       return false;
     }
 
     // cannot move diagonally
     if (fromRow !== toRow && fromCol !== toCol) {
+      console.warn('cannot move diagonally');
       return false;
     }
+
+    // eat the opponent's animal
 
     return true;
   };
@@ -217,10 +228,12 @@ export default function JungleGame() {
 
     if (redPlayerWon) {
       setWinner(createPlayerFromNo(1));
+      alert('Congrats! Red Player Won!!!');
     }
 
     if (bluePlayerWon) {
       setWinner(createPlayerFromNo(2));
+      alert('Congrats! Blue Player Won!!!');
     }
   };
 
@@ -250,7 +263,6 @@ export default function JungleGame() {
       gameState[row][col] &&
       currentPlayer.color === gameState[row][col].player.color
     ) {
-      console.log('hi');
       setSelectedCell([row, col]);
       return;
     }
@@ -261,10 +273,12 @@ export default function JungleGame() {
       newGameState[selectedCell[0]][selectedCell[1]] = '';
       setGameState(newGameState);
       setSelectedCell(null);
-      setCurrentPlayer(currentPlayer.color === 'red' ? createPlayerFromNo(2) : createPlayerFromNo(1));
     }
 
-    checkWinner();
+    // let previous view render pass
+    setTimeout(() => {
+      checkWinner();
+    }, 200);
   };
 
   const resetGame = () => {
@@ -273,7 +287,6 @@ export default function JungleGame() {
 
   const initGame = () => {
     setGameState(initialGameState);
-    setCurrentPlayer(createPlayerFromNo(1));
     setSelectedCell(null);
     setWinner(null);
   };
@@ -284,14 +297,18 @@ export default function JungleGame() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-green-100 p-4">
-      <h1 className="mb-4 text-4xl font-bold">Jungle Game</h1>
+      <h1 className="mb-4">
+        <span className="bg-gradient-to-r from-pink-500 to-violet-500 bg-clip-text text-4xl font-bold text-transparent">
+          Jungle Game
+        </span>
+      </h1>
       <div className="grid grid-cols-7 gap-1 rounded-lg bg-green-400 p-4 shadow-lg">
         {gameBoardLayout.map((row, rowIndex) =>
           row.map((cell, colIndex) => (
             <div
               key={`${rowIndex}-${colIndex}`}
               className={cn(
-                `relative flex h-10 w-10 select-none items-center justify-center rounded bg-white text-2xl`,
+                `relative flex h-10 w-10 select-none items-center justify-center rounded bg-white text-2xl md:h-12 md:w-12`,
                 {
                   'z-10 scale-110 ring-4 ring-red-500':
                     selectedCell && selectedCell[0] === rowIndex && selectedCell[1] === colIndex,
@@ -320,18 +337,11 @@ export default function JungleGame() {
         )}
       </div>
 
-      <div className="p-10">
+      <div className="p-4">
         <button className="h-10 rounded-full bg-red-600 px-4 font-bold text-neutral-100" onClick={resetGame}>
           reset
         </button>
       </div>
-      {winner && (
-        <Alert className="mt-4">
-          <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Game Over!</AlertTitle>
-          <AlertDescription>{winner.color === 'red' ? '🔴' : '🔵'} player wins!</AlertDescription>
-        </Alert>
-      )}
     </div>
   );
 }
